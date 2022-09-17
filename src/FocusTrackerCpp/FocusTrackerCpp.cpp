@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 {
     SetConsoleOutputCP(CP_UTF8);
     _setmode(_fileno(stdout), _O_U16TEXT);
-    setlocale(LC_ALL, "");
+    std::locale::global(std::locale(""));
 
     MainThreadId = GetCurrentThreadId();
     auto hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND,
@@ -109,7 +109,7 @@ void CALLBACK WinEventProc(HWINEVENTHOOK eventHook, DWORD eventKind,
         swprintf_s(&processName[0], 256, L"%hs", NullProcName);
     }
     
-    char timeString[128];
+    char timeString[128] {'\0'};
     strftime(&timeString[0], 128, "%x %T", &timespan);
 
     if(wprintf_s(L"[%hs] \"%s\" (#%p, PID#%lu, Thread#%lu, Name:%s)\n", timeString, title,
