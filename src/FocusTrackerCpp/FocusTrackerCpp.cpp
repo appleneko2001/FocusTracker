@@ -24,6 +24,9 @@ int main(int argc, char* argv[])
     const auto prev_mode = _setmode(_fileno(stdout), _O_U16TEXT);
     std::locale::global(std::locale(""));
 
+    wprintf_s(L"FocusTracker by github@appleneko2001.\n");
+    wprintf_s(L"Used for tracking last focused window, find sus who breaking your joy and focus.\n");
+
     try {
         MainThreadId = GetCurrentThreadId();
         const auto hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND,
