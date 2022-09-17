@@ -6,7 +6,6 @@
 #include <fcntl.h>
 
 #include <iostream>
-#include <pplwin.h>
 #include <Windows.h>
 #include <Psapi.h>
 #include <chrono>
@@ -25,8 +24,8 @@ int main(int argc, char* argv[])
     SetConsoleOutputCP(CP_UTF8);
     _setmode(_fileno(stdout), _O_U16TEXT);
     setlocale(LC_ALL, "");
-    //_setmode(_fileno(stdout), _O_U16TEXT);
-    MainThreadId = Concurrency::details::platform::GetCurrentThreadId();
+
+    MainThreadId = GetCurrentThreadId();
     auto hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND,
         EVENT_SYSTEM_FOREGROUND,
         nullptr,
