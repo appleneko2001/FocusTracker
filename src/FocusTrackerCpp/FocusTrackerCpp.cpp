@@ -24,34 +24,39 @@ int main(int argc, char* argv[])
     _setmode(_fileno(stdout), _O_U16TEXT);
     std::locale::global(std::locale(""));
 
-    MainThreadId = GetCurrentThreadId();
-    auto hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND,
-        EVENT_SYSTEM_FOREGROUND,
-        nullptr,
-        WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
+    try {
+        MainThreadId = GetCurrentThreadId();
+        const auto hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND,
+                                          EVENT_SYSTEM_FOREGROUND,
+                                          nullptr,
+                                          WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
 
-    if(hook == nullptr)
-        throw std::exception("Unable to hook windows event");
+        if (hook == nullptr)
+            throw std::exception("Unable to hook windows event");
 
-    SetConsoleCtrlHandler(CtrlCHandle, true);
-    
-    wprintf_s(L"FocusTracker instance created. Press Control + C to perform stop instance.\n");
+        SetConsoleCtrlHandler(CtrlCHandle, true);
 
-    MSG message;
-    while (!RequiredStop)
-    {
-        while (GetMessage(&message, nullptr, 0, 0))
+        wprintf_s(L"FocusTracker instance created. Press Control + C to perform stop instance.\n");
+        
+        MSG message;
+        while (!RequiredStop)
         {
-            if(message.message == WM_QUIT || message.message == WM_NULL)
-                break;
+            while (GetMessage(&message, nullptr, 0, 0))
+            {
+                if (message.message == WM_QUIT || message.message == WM_NULL)
+                    break;
 
-            DispatchMessage(&message);
+                DispatchMessage(&message);
+            }
         }
-    }
 
-    wprintf_s(L"Stopping FocusTracker instance.\n");
-    if(!UnhookWinEvent(hook))
-        throw std::exception("Unable to unhook windows event");
+        wprintf_s(L"Stopping FocusTracker instance.\n");
+        if (!UnhookWinEvent(hook))
+            throw std::exception("Unable to unhook windows event");
+    }
+    catch (std::exception& error){
+        wprintf_s(L"Program fail: %hs\n", error.what());
+    }
 
     wprintf_s(L"Press Enter key to continue.\n");
     char sym[1];
