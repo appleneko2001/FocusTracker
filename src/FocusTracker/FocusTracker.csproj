@@ -35,6 +35,20 @@
         <WarningLevel>4</WarningLevel>
         <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+      <OutputPath>bin\x86\Release\</OutputPath>
+      <PlatformTarget>x86</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86_64' ">
+      <OutputPath>bin\x86_64\Release\</OutputPath>
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release | x64|AnyCPU' ">
+      <OutputPath>bin\Release | x64\</OutputPath>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug | x64|AnyCPU' ">
+      <OutputPath>bin\Debug | x64\</OutputPath>
+    </PropertyGroup>
     <ItemGroup>
         <Reference Include="System" />
         <Reference Include="System.Core" />
