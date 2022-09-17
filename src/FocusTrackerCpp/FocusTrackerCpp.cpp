@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <Windows.h>
-#include <Psapi.h>
 #include <chrono>
 
 DWORD MainThreadId;
@@ -84,26 +83,26 @@ void CALLBACK WinEventProc(HWINEVENTHOOK eventHook, DWORD eventKind,
     localtime_s(&timespan, &raw_time);
 
     wchar_t* title = nullptr;
-    LONG titleSize = 0;
-    
-    wchar_t processName[256] { '\0' };
+
+    wchar_t processName[260] { '\0' };
     
     DWORD processId;
-    auto threadId = GetWindowThreadProcessId(window, &processId);
+    const auto thread_id = GetWindowThreadProcessId(window, &processId);
 
     if(processId != 0)
     {
-        auto hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, processId);
+        const auto process = OpenProcess(PROCESS_QUERY_INFORMATION , false, processId);
+        auto process_name_size = static_cast<DWORD>(sizeof processName / sizeof(wchar_t));
         
-        if(!GetModuleFileNameExW(hProcess, nullptr, &processName[0], sizeof processName / sizeof(wchar_t)))
+        if(!QueryFullProcessImageNameW(process, 0, &processName[0], &process_name_size))
         {
-            wprintf_s(L"Unable to get process name: Win32 ErrorCode: %lu", GetLastError());
+            wprintf_s(L"Unable to get process name: 0x%X\n", GetLastError());
         }
-        titleSize = SendMessageW(window, WM_GETTEXTLENGTH, 0, 0) + 1;
-        title = static_cast<wchar_t*>(calloc(titleSize, sizeof(wchar_t*)));
-        SendMessageW(window, WM_GETTEXT, titleSize, reinterpret_cast<LPARAM>(&title[0]));
+        const size_t title_size = SendMessageW(window, WM_GETTEXTLENGTH, 0, 0) + 1;
+        title = static_cast<wchar_t*>(calloc(title_size, sizeof(wchar_t*)));
+        SendMessageW(window, WM_GETTEXT, title_size, reinterpret_cast<LPARAM>(&title[0]));
         
-        CloseHandle(hProcess);
+        CloseHandle(process);
     }
     else
     {
@@ -114,7 +113,7 @@ void CALLBACK WinEventProc(HWINEVENTHOOK eventHook, DWORD eventKind,
     strftime(&timeString[0], 128, "%x %T", &timespan);
 
     if(wprintf_s(L"[%hs] \"%s\" (#%p, PID#%lu, Thread#%lu, Name:%s)\n", timeString, title,
-        window, processId, threadId, processName) < 0)
+        window, processId, thread_id, processName) < 0)
     {
         wprintf(L"\nError: ");
         perror("wprintf_s");
