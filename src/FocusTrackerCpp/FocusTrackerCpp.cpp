@@ -21,7 +21,7 @@ BOOL CALLBACK CtrlCHandle(DWORD ctrl_type);
 int main(int argc, char* argv[])
 {
     SetConsoleOutputCP(CP_UTF8);
-    _setmode(_fileno(stdout), _O_U16TEXT);
+    const auto prev_mode = _setmode(_fileno(stdout), _O_U16TEXT);
     std::locale::global(std::locale(""));
 
     try {
@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
     wprintf_s(L"Press Enter key to continue.\n");
     char sym[1];
     std::cin.read(sym, 1);
+
+    _setmode(_fileno(stdout), prev_mode);
     return 0;
 }
 
